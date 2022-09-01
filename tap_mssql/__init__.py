@@ -87,13 +87,21 @@ VARIANT_TYPES = set(["json"])
 def default_date_format():
     return False
 
+def default_singer_decimal():
+    """
+    singer_decimal can be enabled in the the config, which will use singer.decimal as a format and string as the type
+    use this for large/precise numbers
+    """
+    return False
+
 def schema_for_column(c, config):
     """Returns the Schema object for the given Column."""
     data_type = c.data_type.lower()
 
     inclusion = "available"
 
-    use_date_data_type_format = config.get("use_date_datatype") or default_date_format()
+    use_date_data_type_format = config.get('use_date_datatype') or default_date_format()
+    use_singer_decimal = config.get('use_singer_decimal') or default_singer_decimal()
 
     if c.is_primary_key == 1:
         inclusion = "automatic"
@@ -110,13 +118,21 @@ def schema_for_column(c, config):
         result.maximum = 2 ** (bits - 1) - 1
 
     elif data_type in FLOAT_TYPES:
-        result.type = ["null", "number"]
-        result.multipleOf = 10 ** (0 - (c.numeric_scale or 17))
+        if use_singer_decimal:
+            result.type = ["null","string"]
+            result.format = "singer.decimal"
+        else:
+            result.type = ["null", "number"]
+            result.multipleOf = 10 ** (0 - (c.numeric_scale or 17))
 
     elif data_type in DECIMAL_TYPES:
-        result.type = ["null", "number"]
-        result.multipleOf = 10 ** (0 - c.numeric_scale)
-        return result
+        if use_singer_decimal:
+            result.type = ["null","number"]
+            result.format = "singer.decimal"
+            result.additionalProperties = {"scale_precision": f"({c.character_maximum_length},{c.numeric_scale})"}
+        else:
+            result.type = ["null", "number"]
+            result.multipleOf = 10 ** (0 - c.numeric_scale)
 
     elif data_type in STRING_TYPES:
         result.type = ["null", "string"]
