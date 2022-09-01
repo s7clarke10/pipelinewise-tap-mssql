@@ -129,7 +129,7 @@ def schema_for_column(c, config):
         if use_singer_decimal:
             result.type = ["null","number"]
             result.format = "singer.decimal"
-            result.additionalProperties = {"scale_precision": f"({c.character_maximum_length},{c.numeric_scale})"}
+            result.additionalProperties = {"scale_precision": f"({c.numeric_precision},{c.numeric_scale or 0})"}
         else:
             result.type = ["null", "number"]
             result.multipleOf = 10 ** (0 - c.numeric_scale)
