@@ -256,7 +256,7 @@ def discover_catalog(mssql_conn, config):
                     and cc.column_name = c.column_name
 
                 {}
-                ORDER BY c.table_schema, c.table_name
+                ORDER BY c.table_schema, c.table_name, c.ORDINAL_POSITION
         """.format(
                 table_schema_clause
             )
