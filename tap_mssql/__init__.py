@@ -27,8 +27,9 @@ import tap_mssql.sync_strategies.full_table as full_table
 import tap_mssql.sync_strategies.incremental as incremental
 import tap_mssql.sync_strategies.log_based as log_based
 
-from tap_mssql.connection import connect_with_backoff, MSSQLConnection
+from tap_mssql.connection import connect_with_backoff, MSSQLConnection, ResultIterator
 
+ARRAYSIZE = 1
 
 Column = collections.namedtuple(
     "Column",
@@ -262,10 +263,11 @@ def discover_catalog(mssql_conn, config):
             )
         )
         columns = []
-        rec = cur.fetchone()
-        while rec is not None:
+        LOGGER.info(f"{ARRAYSIZE=}")
+        
+        for rec in ResultIterator(column_results, ARRAYSIZE):
             columns.append(Column(*rec))
-            rec = cur.fetchone()
+        
         LOGGER.info("Columns Fetched")
         entries = []
         for (k, cols) in itertools.groupby(columns, lambda c: (c.table_schema, c.table_name)):
