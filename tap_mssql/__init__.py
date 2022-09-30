@@ -738,6 +738,8 @@ def log_server_params(mssql_conn):
 
 
 def main_impl():
+    
+    global ARRAYSIZE
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
     mssql_conn = MSSQLConnection(args.config)
     log_server_params(mssql_conn)
