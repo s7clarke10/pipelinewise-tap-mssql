@@ -742,6 +742,9 @@ def main_impl():
     mssql_conn = MSSQLConnection(args.config)
     log_server_params(mssql_conn)
 
+    ARRAYSIZE = args.config.get('cursor_array_size',1)
+    common.ARRAYSIZE = ARRAYSIZE
+
     if args.discover:
         do_discover(mssql_conn, args.config)
     elif args.catalog:
