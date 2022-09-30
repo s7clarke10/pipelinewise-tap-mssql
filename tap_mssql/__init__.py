@@ -265,7 +265,7 @@ def discover_catalog(mssql_conn, config):
         columns = []
         LOGGER.info(f"{ARRAYSIZE=}")
         
-        for rec in ResultIterator(column_results, ARRAYSIZE):
+        for rec in ResultIterator(cur, ARRAYSIZE):
             columns.append(Column(*rec))
         
         LOGGER.info("Columns Fetched")

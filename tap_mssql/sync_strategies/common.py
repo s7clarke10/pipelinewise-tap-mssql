@@ -181,7 +181,7 @@ def sync_query(cursor, catalog_entry, state, select_sql, columns, stream_version
         counter.tags["database"] = database_name
         counter.tags["table"] = catalog_entry.table
         
-        for row in ResultIterator(results, ARRAYSIZE):
+        for row in ResultIterator(cursor, ARRAYSIZE):
             counter.increment()
             rows_saved += 1
             record_message = row_to_singer_record(
