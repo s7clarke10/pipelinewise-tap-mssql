@@ -124,6 +124,31 @@ The characterset for the database / source system. The default is `utf8`, howeve
 These are the same basic configuration properties used by the mssql command-line
 client (`mssql`).
 
+Optional:
+
+To emit all numeric values as strings and treat floats as string data types for the target, set use_singer_decimal to true. The resulting SCHEMA message will contain an attribute in additionalProperties containing the scale and precision of the discovered property:
+
+#### SCHEMA message
+```json
+"property": {
+            "inclusion": "available",
+            "format": "singer.decimal",
+            "type": [
+              "null",
+              "number"
+            ],
+            "additionalProperties": {
+              "scale_precision": "(12,0)"
+            }
+```
+
+Usage:
+```json
+{
+  "use_singer_decimal": true
+}
+```
+
 ### Discovery mode
 
 The tap can be invoked in discovery mode to find the available tables and
