@@ -145,7 +145,10 @@ def row_to_singer_record(catalog_entry, version, row, columns, time_extracted, c
         elif isinstance(elem, uuid.UUID):
             row_to_persist += (str(elem),)
         elif property_format == 'singer.decimal':
-            row_to_persist += (str(elem),)
+            if elem is None:
+                row_to_persist += (elem,)
+            else:
+                row_to_persist += (str(elem),)
         else:
             row_to_persist += (elem,)
     rec = dict(zip(columns, row_to_persist))
