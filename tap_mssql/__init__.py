@@ -467,12 +467,12 @@ def get_non_cdc_streams(mssql_conn, catalog, config, state):
                 stream.tap_stream_id == currently_syncing
                 and is_valid_currently_syncing_stream(stream, state)
            ):
-            LOGGER.info(f"{stream.tap_stream_id} is currently_syncing: ordering is 0")
+            LOGGER.debug(f"{stream.tap_stream_id} is currently_syncing: ordering is 0")
             return 0
         elif not(state.get("bookmarks",{}).get(stream.tap_stream_id)):
             if replication_method == 'LOG_BASED':
                 LOGGER.info("LOG_BASED stream %s requires full historical sync", stream.tap_stream_id)
-            LOGGER.info(f"{stream.tap_stream_id} does not have a state: ordering is 1")
+            LOGGER.debug(f"{stream.tap_stream_id} does not have a state: ordering is 1")
             return 1
         elif (
                 replication_method == 'LOG_BASED'
@@ -480,10 +480,10 @@ def get_non_cdc_streams(mssql_conn, catalog, config, state):
             ):
             if common.get_is_view(stream):
                 raise Exception(f"Unable to replicate stream({stream.stream}) with cdc because it is a view.")  
-            LOGGER.info(f"{stream.tap_stream_id} does have a state, is log based and not a view: ordering is 2")
+            LOGGER.debug(f"{stream.tap_stream_id} does have a state, is log based and not a view: ordering is 2")
             return 2
         else:
-            LOGGER.info(f"{stream.tap_stream_id} does have a state: ordering is 3")
+            LOGGER.debug(f"{stream.tap_stream_id} does have a state: ordering is 3")
             return 3
         
     # Filter the catalog by those selected and then order by the ordering function
