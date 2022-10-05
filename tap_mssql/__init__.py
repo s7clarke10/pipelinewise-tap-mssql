@@ -463,10 +463,9 @@ def get_non_cdc_streams(mssql_conn, catalog, config, state):
 
     for stream in selected_streams:
         stream_metadata = metadata.to_map(stream.metadata)
-        # if stream_metadata.table in ["aagaggpercols", "aagaggdef"]:
+
         for k, v in stream_metadata.get((), {}).items():
             LOGGER.info(f"{k}: {v}")
-            # LOGGER.info(stream_metadata.get((), {}).get("table-key-properties"))
         replication_method = stream_metadata.get((), {}).get("replication-method")
         stream_state = state.get("bookmarks", {}).get(stream.tap_stream_id)
 
@@ -499,7 +498,7 @@ def get_non_cdc_streams(mssql_conn, catalog, config, state):
         currently_syncing_stream = list(
             filter(
                 lambda s: s.tap_stream_id == currently_syncing and is_valid_currently_syncing_stream(s, state),
-                streams_with_state,
+                ordered_streams,
             )
         )
 
