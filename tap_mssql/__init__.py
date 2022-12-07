@@ -639,9 +639,8 @@ def sync_non_cdc_streams(mssql_conn, non_cdc_catalog, config, state):
         if replication_method == "INCREMENTAL" and not replication_key:
             LOGGER.info(f"No replication key for {catalog_entry.table}, using full table replication")
             replication_method = "FULL_TABLE"
-        if replication_method == "INCREMENTAL" and not primary_keys:
-            LOGGER.info(f"No primary key for {catalog_entry.table}, using full table replication")
-            replication_method = "FULL_TABLE"
+        # Check for INCREMENTAL load without primary keys removed
+        # INCREMENTAL loads can be performed without primary keys as long as there is a replication key
         if replication_method == "LOG_BASED" and not start_lsn:
             LOGGER.info(
                 f"No initial load for {catalog_entry.table}, using full table replication"
