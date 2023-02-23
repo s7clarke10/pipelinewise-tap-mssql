@@ -1,4 +1,5 @@
 # pipelinewise-tap-mssql
+![singer_sqlserver_tap](https://user-images.githubusercontent.com/84364906/220873968-8b2e7357-8539-421f-888f-97fb3a17975e.png)
 
 [Singer](https://www.singer.io/) tap that extracts data from a [mssql](https://www.mssql.com/) database and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
