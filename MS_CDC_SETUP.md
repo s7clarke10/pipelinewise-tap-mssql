@@ -151,6 +151,13 @@ EXEC sys.sp_cdc_enable_table
 @supports_net_changes = 1  
 ; 
 
+-- =========
+-- Grant permissions for each base database table (if required)
+-- =========
+-- GRANT SELECT on each source table to enable CDC table-valued function calls
+GRANT SELECT ON [<sourceSchemaName>].[<sourceTableName>] TO CDC_Role;
+
+
 -- =========  
 -- Fixing the logging if it was not working  
 -- =========  
