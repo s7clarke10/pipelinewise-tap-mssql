@@ -473,18 +473,30 @@ exec msdb.dbo.rds_cdc_disable_db [<database_name>];
 ```
 
 
-## Code to manage structural changes to tables being captured.
+## Code to manage structural changes (DDL) to tables being captured.
 
 If a new columns is added to a base table which has been enrolled for CDC, it will not be automatically propagated to the capture table. If a table is being altered, the CDC capture routines need to be re-issued to ensure all columns are being captured.
 
-The following script provides a solution for updating the capture table with new columns without affecting the TAP data ingestion / data pipeline.
+This script can be used to re-enrol a table for CDC, ideally immediately after any ALTER TABLE statements have been issued.
+
+This makes use of the fact that a table can have two capture instances enabled on it simultaneously. In this description, the current capture instance will be called `A` and the temporary one called `B`
+
+1. Enable a new capture instance on the table `B`
+2. Get a list of columns that are common to both capture instances `A` and `B`
+3. Insert the contents of the change table for `A` into `B`
+4. Set the `start_lsn` for capture instance `B` to the `start_lsn` for capture instance `A` in `cdc.change_tables` (alternatively this value could be stored in a variable)
+5. Disable capture instance `A`
+6. Re-enable capture instance `A` - this resets the `start_lsn` in `cdc.change_tables`
+7. Insert the contents of the change table for `B` into `A`
+8. Set the `start_lsn` for capture instance `A` to the `start_lsn` for capture instance `B` in `cdc.change_tables`
+9. Disable capture instance `B`
 
 ```sql
 
 /* Re Enrolment of a table in CDC (ideally immediately) after an ALTER TABLE */
 /* operation has occurred on the base table */
 DECLARE @source_schema varchar(max) = 'dbo'
-DECLARE @source_name varchar(max) = 'Example_table'
+DECLARE @source_name varchar(max) = 'MyBaseTableName'
 DECLARE @cdc_schema varchar(max) = 'cdc'
 DECLARE @column_list varchar(max)
 DECLARE @sql varchar(max)
@@ -496,6 +508,10 @@ DECLARE @capture_instance_temp varchar(max)
 SET @capture_instance_temp = @capture_instance+'_temp'
 DECLARE @ct_table_temp varchar(max)
 SET @ct_table_temp = @capture_instance_temp+'_CT'
+
+--Test alterations on the base table here
+--SET @sql = 'ALTER TABLE '+@source_schema+'.'+@source_name+' DROP COLUMN TestNewColumn'
+--EXEC(@sql)
 
 /* Enrol the table with a temporary capture instance */
 EXEC [sys].[sp_cdc_enable_table]
@@ -576,5 +592,6 @@ EXEC [sys].[sp_cdc_disable_table]
   @source_schema = @source_schema,
   @source_name   = @source_name,
   @capture_instance = @capture_instance_temp
+
   
 ```
