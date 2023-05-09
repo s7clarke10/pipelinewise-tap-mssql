@@ -237,7 +237,7 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns, stream_version
 
                 if lsn_from <= state_last_lsn:
                     LOGGER.info("The last lsn processed as per the state file %s, minimum available lsn for extract table %s, and the maximum lsn is %s.", state_last_lsn, lsn_from, lsn_to)
-                    if lsn_from == state_last_lsn:
+                    if lsn_to == state_last_lsn:
                         LOGGER.info("The last lsn processed as per the state file is equal to the max lsn available - no changes expected - state lsn will not be incremented")
                         from_lsn_expression = "{}".format(py_bin_to_mssql(state_last_lsn))
                     else:
