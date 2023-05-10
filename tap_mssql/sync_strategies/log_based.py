@@ -237,12 +237,17 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns, stream_version
 
                 if lsn_from <= state_last_lsn:
                     LOGGER.info("The last lsn processed as per the state file %s, minimum available lsn for extract table %s, and the maximum lsn is %s.", state_last_lsn, lsn_from, lsn_to)
+                    if lsn_to == state_last_lsn:
+                        LOGGER.info("The last lsn processed as per the state file is equal to the max lsn available - no changes expected - state lsn will not be incremented")
+                        from_lsn_expression = "{}".format(py_bin_to_mssql(state_last_lsn))
+                    else:
+                        from_lsn_expression = "sys.fn_cdc_increment_lsn({})".format(py_bin_to_mssql(state_last_lsn))
                 else:
                     raise Exception("Error {}.{}: CDC changes have expired, the minimum lsn is {}, the last processed lsn is {}. Recommend a full load as there may be missing data.".format(schema_name, table_name, lsn_from, state_last_lsn ))                
 
                 select_sql = """DECLARE @from_lsn binary (10), @to_lsn binary (10)
                     
-                                SET @from_lsn = sys.fn_cdc_increment_lsn({})
+                                SET @from_lsn = {}
                                 SET @to_lsn = {}
 
                                 SELECT {}
@@ -261,7 +266,7 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns, stream_version
                                     , __$operation _sdc_lsn_operation
                                 FROM cdc.fn_cdc_get_all_changes_{}(@from_lsn, @to_lsn, 'all')
                                 ORDER BY __$start_lsn, __$seqval, __$operation
-                                ;""".format(py_bin_to_mssql(state_last_lsn), py_bin_to_mssql(lsn_to), ",".join(escaped_columns), schema_table )
+                                ;""".format(from_lsn_expression, py_bin_to_mssql(lsn_to), ",".join(escaped_columns), schema_table )
 
                 params = {}
 
