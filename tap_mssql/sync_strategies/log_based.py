@@ -170,7 +170,7 @@ def sync_historic_table(mssql_conn, config, catalog_entry, state, columns, strea
                                 , null _sdc_lsn_deleted_at
                                 , '00000000000000000000' _sdc_lsn_value
                                 , '00000000000000000000' _sdc_lsn_seq_value
-                                , 1 as _sdc_lsn_operation
+                                , 2 as _sdc_lsn_operation
                             FROM {}.{}
                             ;""".format(",".join(escaped_columns), schema_name, table_name)
             params = {}
