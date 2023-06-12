@@ -214,7 +214,7 @@ def discover_catalog(mssql_conn, config):
             """SELECT table_schema,
                 table_name,
                 table_type
-            FROM [INFORMATION_SCHEMA].[TABLES] c
+            FROM INFORMATION_SCHEMA.TABLES c
             {}
         """.format(
                 table_schema_clause
@@ -234,9 +234,9 @@ def discover_catalog(mssql_conn, config):
                 , c.table_name
                 , c.column_name
 
-                from [INFORMATION_SCHEMA].[CONSTRAINT_COLUMN_USAGE] c
+                from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE c
 
-                join [INFORMATION_SCHEMA].[TABLE_CONSTRAINTS] tc
+                join INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
                         on tc.table_schema = c.table_schema
                         and tc.table_name = c.table_name
                         and tc.constraint_name = c.constraint_name
@@ -249,7 +249,7 @@ def discover_catalog(mssql_conn, config):
                     numeric_precision,
                     numeric_scale,
                     case when cc.column_name is null then 0 else 1 end
-                FROM [INFORMATION_SCHEMA].[COLUMNS] c
+                FROM INFORMATION_SCHEMA.COLUMNS c
 
                 left join constraint_columns cc
                     on cc.table_name = c.table_name
