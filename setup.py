@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="tap-mssql",
-    version="1.0.5",
+    version="1.0.6",
     description="Singer.io tap for extracting data from SQL Server - PipelineWise compatible",
     author="Rob Winters",
     url="https://github.com/wintersrd/pipelinewise-tap-mssql",
